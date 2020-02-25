@@ -1,4 +1,4 @@
-# win_tomcat
+# win-tomcat
 
 ## Docker Images
 * Tomcat
