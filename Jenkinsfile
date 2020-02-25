@@ -1,11 +1,26 @@
-pipeline {
-  agent { dockerfile true }
-  stages {
-        stage('Test') {
-            steps {
-                sh 'node --version'
-                sh 'svn --version'
-            }
-        }
-    }  
+#!/usr/bin/env groovy
+
+node (label: 'win-agent-1') {
+    def app
+
+    stage('Clone repository') {
+          /* Let's make sure we have the repository cloned to our workspace */
+          checkout scm
+    }
+    stage('Build container') {
+      /* This builds the actual image; synonymous to
+      * docker build on the command line. Copies image to DTR */
+      docker.withRegistry('http://pe-201642-agent.puppetdebug.vlan:5000', 'portus_registry') {
+          app = docker.build("pe-201642-agent.puppetdebug.vlan:5000/windows/win_tomcat:${env.BUILD_NUMBER}", '--no-cache --pull .')
+          app.push("${env.BUILD_NUMBER}")
+      }
+   }
+
+   stage('Remove existing container') {
+    sh 'docker rm -f win-tomcat || true'
+  }
+
+   stage('Deploy new container') {
+     docker.image("pe-201642-agent.puppetdebug.vlan:5000/windows/win_tomcat:${env.BUILD_NUMBER}").run("--name php -p 8080:8080")
+   }
 }
