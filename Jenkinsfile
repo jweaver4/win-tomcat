@@ -17,10 +17,10 @@ node (label: 'win-agent-1') {
    }
 
    stage('Remove existing container') {
-    sh 'docker rm -f win-tomcat || true'
+    sh 'docker rm -f tomcat || true'
   }
 
    stage('Deploy new container') {
-     docker.image("pe-201642-agent.puppetdebug.vlan:5000/windows/win_tomcat:${env.BUILD_NUMBER}").run("--name php -p 8080:8080")
+     docker.image("pe-201642-agent.puppetdebug.vlan:5000/windows/win_tomcat:${env.BUILD_NUMBER}").run("--name tomcat -t -d -p 8080:8080")
    }
 }
