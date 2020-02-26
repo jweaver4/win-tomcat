@@ -9,9 +9,11 @@ node (label: 'win-agent-1') {
     }
 
     stage('Test image') {
-    /* Sonarqube at http://fsxopsx1548.edc.ds1.usda.gov:9090*/
-    withSonarQubeEnv('SonarServer Windows') {
-    bat "C:/sonar-scanner-4.2.0.1873-windows/bin/sonar-scanner.bat"
+      withSonarQubeEnv('sonarqube') {
+        bat "C:/sonarscanner-msbuild/sonar-scanner-3.3.0.1492/bin/sonar-scanner.bat"
+      }
+      timeout(time: 10, unit: 'MINUTES') {
+       waitForQualityGate abortPipeline: true
       }
     }
 
